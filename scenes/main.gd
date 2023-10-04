@@ -4,12 +4,20 @@ extends Node
 @export var collision_momentum_tolerance = 0.2
 @export var collision_velocity_boost = 2.0
 @export var collision_dedupe_time_ms = 100
+@export var slowdown_time_ms = 1000
 
 var collision_cache = {}
+var player_count = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	new_game()
+
+func new_game():
+	$UserInterface/DimRect.hide()
 	var meatballs = get_tree().get_nodes_in_group("meatballs")
+	player_count = meatballs.size()
+	set_player_count(player_count)
 	for node in meatballs:
 		node.connect("meatball_collided", _handle_meatball_collided)
 		node.connect("died", _handle_meatball_died)
@@ -64,4 +72,32 @@ func _handle_meatball_died(source: Meatball):
 	if parent is Opponent:
 		print("Opponent meatball died")
 		parent.queue_free()
-	# Otherwise game over
+		player_count -= 1
+		set_player_count(player_count)
+		if player_count == 1:
+			# Winner!
+			show_victory()
+	else:
+		parent.queue_free()
+		player_count -= 1
+		set_player_count(player_count)
+		show_defeat()
+
+func set_player_count(count: int):
+	$UserInterface/PlayerCountLabel.text = "Active meatballs: %s" % str(count)
+
+func show_victory():
+	$UserInterface/DimRect/GameOverMessage.text = "You have consumed all the meat!"
+	$UserInterface/DimRect.show()
+	reset_game()
+
+func show_defeat():
+	$UserInterface/DimRect/GameOverMessage.text = "You have been consumed"
+	$UserInterface/DimRect.show()
+	reset_game()
+
+func reset_game():
+	$ResetTimer.start()
+
+func _on_reset_timer_timeout():
+	get_tree().reload_current_scene()
