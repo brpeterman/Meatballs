@@ -14,6 +14,7 @@ var GRAVITY = ProjectSettings.get_setting("physics/3d/default_gravity")
 var MASS_DELTA = 0.5
 var MAX_MASS = 3.0
 var SIZE_DELTA = 1.4
+var OUT_OF_BOUNDS = 500.0
 
 var input_direction = Vector3.ZERO
 var jump_impulse = Vector3.ZERO
@@ -28,6 +29,9 @@ func _process(delta):
 	pass
 
 func _physics_process(delta):
+	if global_position.length() > OUT_OF_BOUNDS:
+		emit_signal("died", self)
+	
 	var desired_velocity = velocity
 	
 	if not is_on_floor():
