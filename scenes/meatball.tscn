@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3 uid="uid://dg6mipn6t7m8s"]
 
 [ext_resource type="Script" path="res://scenes/meatball.gd" id="1_5wy6x"]
+[ext_resource type="ArrayMesh" uid="uid://cfke0cy4sme61" path="res://objects/meatball.obj" id="2_e2q6a"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_n1pqf"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_t574h"]
+radius = 1.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_77uxm"]
 albedo_color = Color(0.27451, 0.0862745, 0, 1)
@@ -22,7 +22,7 @@ script = ExtResource("1_5wy6x")
 shape = SubResource("SphereShape3D_n1pqf")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_t574h")
+mesh = ExtResource("2_e2q6a")
 surface_material_override/0 = SubResource("StandardMaterial3D_77uxm")
 
 [node name="ForceVector" type="MeshInstance3D" parent="."]

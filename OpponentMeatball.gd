@@ -6,6 +6,7 @@ class_name Opponent
 @export var base_speed = 10.0
 @export var retarget_time = 5.0
 @export var retarget_jitter = 1.0
+@export var max_jump_wait = 10.0
 
 var pawn: Meatball
 var target: Meatball
@@ -17,6 +18,7 @@ func _ready():
 	pawn.jump_power = jump_power
 	pawn.base_speed = base_speed
 	$RetargetTimer.wait_time = retarget_time + randf_range(-retarget_jitter/2, retarget_jitter/2)
+	$JumpTimer.wait_time = randf_range(0, max_jump_wait)
 	choose_target()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -41,3 +43,6 @@ func choose_target():
 
 func _on_retarget_timer_timeout():
 	choose_target()
+
+func _on_jump_timer_timeout():
+	pawn.jump()

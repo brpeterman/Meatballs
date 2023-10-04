@@ -7,3 +7,6 @@
 script = ExtResource("1_af0f7")
 
 [node name="Meatball" parent="." instance=ExtResource("2_3pqbj")]
+
+[node name="Camera3D" type="Camera3D" parent="Meatball"]
+transform = Transform3D(1, 0, 0, 0, 0.624207, 0.781259, 0, -0.781259, 0.624207, 0, 4.74365, 3.88195)

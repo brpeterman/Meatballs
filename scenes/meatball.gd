@@ -58,6 +58,11 @@ func _physics_process(delta):
 			jump_impulse = Vector3.ZERO
 	
 	velocity = desired_velocity
+	
+	# Rotate the mesh based on velocity
+	$MeshInstance3D.rotate(Vector3(0, 0, -1), velocity.x * delta)
+	$MeshInstance3D.rotate(Vector3(1, 0, 0), velocity.z * delta)
+	
 	move_and_slide()
 	
 	for i in get_slide_collision_count():
