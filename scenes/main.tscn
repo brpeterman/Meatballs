@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=3 uid="uid://d4avt870ck81f"]
+
+[ext_resource type="Script" path="res://scenes/main.gd" id="1_fdygr"]
+[ext_resource type="PackedScene" uid="uid://bl4rmr34l48dw" path="res://scenes/level_1.tscn" id="1_t6vxg"]
+[ext_resource type="Script" path="res://scenes/level_1.gd" id="2_ah8y1"]
+[ext_resource type="PackedScene" uid="uid://cop5dcpbij7wi" path="res://scenes/player.tscn" id="3_mr1ls"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_fdygr")
+
+[node name="Level1" parent="." instance=ExtResource("1_t6vxg")]
+script = ExtResource("2_ah8y1")
+
+[node name="Player" parent="." instance=ExtResource("3_mr1ls")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.53519, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 0.597583, 0.801807, 0, -0.801807, 0.597583, 0, 10.4756, 10.3417)
+fov = 63.8
+far = 109.02

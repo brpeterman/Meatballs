@@ -1,0 +1,59 @@
+[gd_scene load_steps=5 format=3 uid="uid://bl4rmr34l48dw"]
+
+[ext_resource type="PackedScene" uid="uid://62v672g11cu" path="res://scenes/opponent_meatball.tscn" id="1_2hvge"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_272qi"]
+size = Vector3(60, 2, 60)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wnysv"]
+size = Vector3(60, 2, 60)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b3d1p"]
+albedo_color = Color(0.541176, 0.360784, 0.490196, 1)
+
+[node name="Level1" type="Node3D"]
+
+[node name="Ground" type="RigidBody3D" parent="."]
+collision_mask = 0
+gravity_scale = 0.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+shape = SubResource("BoxShape3D_272qi")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("BoxMesh_wnysv")
+surface_material_override/0 = SubResource("StandardMaterial3D_b3d1p")
+
+[node name="Slope" type="RigidBody3D" parent="."]
+transform = Transform3D(0.832863, 0.553479, 0, -0.553479, 0.832863, 0, 0, 0, 1, -4.86475, 0, 0)
+collision_mask = 0
+gravity_scale = 0.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Slope"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+shape = SubResource("BoxShape3D_272qi")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Slope"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("BoxMesh_wnysv")
+surface_material_override/0 = SubResource("StandardMaterial3D_b3d1p")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Slope"]
+transform = Transform3D(0.426679, 0.904403, 0, -0.904403, 0.426679, 0, 0, 0, 1, -10.8607, -8.21751, 0)
+mesh = SubResource("BoxMesh_wnysv")
+surface_material_override/0 = SubResource("StandardMaterial3D_b3d1p")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.830691, -0.464929, -0.306257, 0.399691, 0.115095, 0.909395, -0.387556, -0.877835, 0.281437, 0, 6.74317, 0)
+shadow_enabled = true
+
+[node name="OpponentMeatball" parent="." instance=ExtResource("1_2hvge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.15517, 0, -4.27709)
+
+[node name="OpponentMeatball2" parent="." instance=ExtResource("1_2hvge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.94488, 0, 3.2615)
+
+[node name="OpponentMeatball3" parent="." instance=ExtResource("1_2hvge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.859015, 0, 8.58567)

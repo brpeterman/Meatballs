@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://cop5dcpbij7wi"]
+
+[ext_resource type="Script" path="res://scenes/player.gd" id="1_af0f7"]
+[ext_resource type="PackedScene" uid="uid://dg6mipn6t7m8s" path="res://scenes/meatball.tscn" id="2_3pqbj"]
+
+[node name="Player" type="Node3D" groups=["player"]]
+script = ExtResource("1_af0f7")
+
+[node name="Meatball" parent="." instance=ExtResource("2_3pqbj")]

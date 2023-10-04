@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://dg6mipn6t7m8s"]
+
+[ext_resource type="Script" path="res://scenes/meatball.gd" id="1_5wy6x"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_n1pqf"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_t574h"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_77uxm"]
+albedo_color = Color(0.27451, 0.0862745, 0, 1)
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_g1ks5"]
+
+[node name="Meatball" type="CharacterBody3D" groups=["meatballs"]]
+collision_layer = 2
+collision_mask = 3
+floor_stop_on_slope = false
+floor_block_on_wall = false
+script = ExtResource("1_5wy6x")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_n1pqf")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_t574h")
+surface_material_override/0 = SubResource("StandardMaterial3D_77uxm")
+
+[node name="ForceVector" type="MeshInstance3D" parent="."]
+mesh = SubResource("ImmediateMesh_g1ks5")
