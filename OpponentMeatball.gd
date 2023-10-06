@@ -30,7 +30,8 @@ func _physics_process(delta):
 		return
 	
 	var direction = pawn.global_position.direction_to(target.global_position)
-	direction.y = 0.0
+	# Jitter a bit for some randomness
+	direction = Vector3(direction.x + randf_range(-0.1, 0.1), 0.0, direction.z + randf_range(-0.1, 0.1))
 	pawn.set_direction(direction.normalized())
 
 func choose_target():
@@ -39,10 +40,12 @@ func choose_target():
 		return item != pawn
 	var filtered_meatballs = meatballs.filter(filter_self)
 	
-	target = filtered_meatballs[randi_range(0, filtered_meatballs.size() - 1)]
+	if filtered_meatballs.size() > 0:
+		target = filtered_meatballs[randi_range(0, filtered_meatballs.size() - 1)]
 
 func _on_retarget_timer_timeout():
 	choose_target()
 
 func _on_jump_timer_timeout():
+	$JumpTimer.wait_time = randf_range(0, max_jump_wait)
 	pawn.jump()
