@@ -8,20 +8,31 @@ extends Marker3D
 
 func _ready():
 	top_level = true
-	target.meatball_collided.connect(_on_meatball_body_meatball_collided)
+	target.resized.connect(_on_resized)
+	_resize()
+	
+func _input(ev):
+	if ev is InputEventKey:
+		if ev.is_pressed() and ev.keycode == KEY_E:
+			target.grow()
 	
 func _process(delta):
 	if not target: return
 	global_position = target.global_position
 	global_position.y += height
 
-func _on_meatball_body_meatball_collided(source, body, normal):
+func _on_resized():
 	_resize()
 
 func _resize():
 	if not target or not collider: return
-	var h = 0.5 * pow(target.SIZE_DELTA, target.mass)
+	
+	var sphere = collider.shape as SphereShape3D
+	var radius = sphere.radius
 	var tween = create_tween()
-	tween.tween_property(self, 'height', h, 0.1) \
-		.set_ease(Tween.EASE_IN_OUT) \
-		.set_trans(Tween.TRANS_CUBIC)
+	var y = radius
+	
+	tween.parallel().tween_property(self, 'height', y + 0.2, 0.1)
+	tween.tween_property(self, 'scale', Vector3(1.4, 1.6, 1.4), 0.1)
+	tween.parallel().tween_property(self, 'height', y, 0.1)
+	tween.tween_property(self, 'scale', Vector3(1.0, 1.0, 1.0), 0.1)
