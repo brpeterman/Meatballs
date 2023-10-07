@@ -1,30 +1,35 @@
 extends RigidBody3D
 class_name Meatball
 
-signal meatball_collided
-signal died
-signal resized
+signal meatball_collided(originator: Meatball, other: Meatball, normal: Vector3)
+signal saw_collided(body: Meatball, normal: Vector3)
+signal died(meatball: Meatball)
+signal resized(new_size: float)
 
 @export var base_speed = 30.0
 @export var movement_force = 100.0
 @export var drag = 0.2
 @export var jump_power = 5.0
 
-var MASS_DELTA = 0.25
-var SIZE_DELTA = pow((3 * MASS_DELTA) / (4 * PI), 1.0/3.0) / 2.0
-var OUT_OF_BOUNDS = 500.0
+const MASS_DELTA = 0.25
+const SIZE_DELTA = pow((3 * MASS_DELTA) / (4 * PI), 1.0/3.0)
+const OUT_OF_BOUNDS = 500.0
+const MAX_SPEED = 100.0
+const BASE_COLLISION_RADIUS = 1.9
+const BASE_MESH_SCALE = 2.0
+const MIN_MASS = 1.0
 
 var input_direction = Vector3.ZERO
 var jump_impulse = Vector3.ZERO
-var dead = false
 var floor_normal = Vector3.ZERO
 
 func _ready():
-	resize(1.0)
+	var collision_shape = $CollisionShape3D.shape as SphereShape3D
+	collision_shape.radius = BASE_COLLISION_RADIUS
+	$MeshInstance3D.scale = Vector3(BASE_MESH_SCALE, BASE_MESH_SCALE, BASE_MESH_SCALE)
+	resize(0.0)
 
 func _process(delta):
-	#var force_vector_mesh = $ForceVector.mesh
-	#force_vector_mesh
 	pass
 
 func _physics_process(delta):
@@ -45,19 +50,25 @@ func _physics_process(delta):
 		if jump_impulse != Vector3.ZERO:
 			apply_central_impulse(jump_impulse)
 			jump_impulse = Vector3.ZERO
+		
+	if linear_velocity.length() > MAX_SPEED:
+		linear_velocity = linear_velocity.normalized() * MAX_SPEED
 
 func _integrate_forces(state: PhysicsDirectBodyState3D):	
 	for contact_idx in state.get_contact_count():
 		var normal = state.get_contact_local_normal(contact_idx)
 		var body = state.get_contact_collider_object(contact_idx)
 		if body is Meatball:
-			emit_signal("meatball_collided", self, body as Meatball, normal)
+			meatball_collided.emit(self, body, normal)
+		if body is SawBlades:
+			saw_collided.emit(self, normal)
 	
-	state.integrate_forces()
+	#state.integrate_forces()
 	
 func reload_floor_normal():
 	var space_state = get_world_3d().direct_space_state
-	var length = sqrt(2) * $CollisionShape3D.scale.x # Far enough to see a 45deg slope
+	var collision_shape = $CollisionShape3D.shape as SphereShape3D
+	var length = sqrt(2) * collision_shape.radius # Far enough to see a 45deg slope
 	var query = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3.DOWN * length)
 	query.exclude = [self]
 	var result = space_state.intersect_ray(query)
@@ -83,8 +94,8 @@ func jump():
 	jump_impulse = floor_normal * jump_power * sqrt(mass)
 
 func shrink():
-	if mass <= MASS_DELTA:
-		emit_signal("died", self)
+	if mass <= MIN_MASS:
+		died.emit(self)
 		return
 	mass -= MASS_DELTA
 	resize(-SIZE_DELTA)
@@ -92,11 +103,11 @@ func shrink():
 func grow():
 	mass += MASS_DELTA
 	resize(SIZE_DELTA)
-	
 
 func resize(size: float):
-	var new_size = $CollisionShape3D.scale.x + size
+	var collision_shape = $CollisionShape3D.shape as SphereShape3D
+	var new_mesh_scale = $MeshInstance3D.scale.x + size
 	var tween = create_tween()
-	tween.tween_property($MeshInstance3D, "scale", Vector3(new_size, new_size, new_size), 0.2).set_trans(Tween.TRANS_SPRING)
-	$CollisionShape3D.scale = Vector3(new_size, new_size, new_size)
-	resized.emit()
+	tween.tween_property($MeshInstance3D, "scale", Vector3(new_mesh_scale, new_mesh_scale, new_mesh_scale), 0.2).set_trans(Tween.TRANS_SPRING)
+	collision_shape.radius += size
+	resized.emit(new_mesh_scale)

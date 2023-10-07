@@ -1,9 +1,10 @@
 extends Node
 
-@export var collision_momentum_threshold = 3.0
+@export var collision_energy_threshold = 100.0
 @export var collision_momentum_tolerance = 0.2
-@export var collision_velocity_boost = 20.0
+@export var collision_energy_modulation = 0.1
 @export var collision_dedupe_time_ms = 500
+@export var sawblade_impulse = 50.0
 
 var collision_cache = {}
 var player_count = 0
@@ -19,12 +20,8 @@ func new_game():
 	set_player_count(player_count)
 	for node in meatballs:
 		node.connect("meatball_collided", _handle_meatball_collided)
+		node.connect("saw_collided", _handle_saw_collided)
 		node.connect("died", _handle_meatball_died)
-	
-	$Player.connect("player_on_floor_status", _handle_player_on_floor_status)
-
-func compare_momentum(a: Meatball, b: Meatball):
-	return a.linear_velocity.length() * a.mass < b.linear_velocity.length() * b.mass
 
 func _handle_meatball_collided(originator: Meatball, other: Meatball, normal: Vector3):
 	# Ignore collisions that were already handled
@@ -41,27 +38,37 @@ func collision_key(a: Node, b: Node):
 	ids.sort()
 	return str(ids[0]) + str(ids[1])
 
-func is_trading_collision(velocity1: Vector3, mass1: float, velocity2: Vector3, mass2: float):
-	var momentum1 = velocity1.length() * mass1
-	var momentum2 = velocity2.length() * mass2
+func is_trading_collision(a: Meatball, b: Meatball):
+	var velocity1 = a.linear_velocity
+	var velocity2 = b.linear_velocity
+	var energy1 = kinetic_energy(a)
+	var energy2 = kinetic_energy(b)
 	var angle = min(velocity1.angle_to(velocity2), velocity2.angle_to(velocity1))
 	# TODO: Ignore angle if one is much faster than the other
-	return momentum1 + momentum2 > collision_momentum_threshold\
-		and abs(momentum1 - momentum2) > collision_momentum_tolerance\
+	return energy1 + energy2 > collision_energy_threshold\
 		and angle > PI/2.0
+
+func compare_energy(a: Meatball, b: Meatball):
+	return kinetic_energy(a) < kinetic_energy(b)
+
+func kinetic_energy(body: Meatball):
+	return body.mass * pow(body.linear_velocity.length(), 2) / 2.0
 
 func smash_meatballs(originator: Meatball, other: Meatball, normal: Vector3):
 	# Find the fastest, increase its mass. Find the slowest, decrease its mass
-	if is_trading_collision(originator.linear_velocity, originator.mass, other.linear_velocity, other.mass):
+	if is_trading_collision(originator, other):
 		var ranked = [originator, other] as Array[Meatball]
-		ranked.sort_custom(compare_momentum)
+		ranked.sort_custom(compare_energy)
 		ranked[0].shrink()
 		ranked[1].grow()
 	
 	# Rebound off each other
-	var total_speed = originator.linear_velocity.length() + other.linear_velocity.length()
-	originator.apply_central_force(normal * total_speed * collision_velocity_boost * other.mass)
-	other.apply_central_force(-normal * total_speed * collision_velocity_boost * originator.mass)
+	originator.apply_central_impulse(normal * kinetic_energy(originator) * collision_energy_modulation)
+	other.apply_central_impulse(-normal * kinetic_energy(other) * collision_energy_modulation)
+
+func _handle_saw_collided(body: Meatball, normal: Vector3):
+	body.shrink()
+	body.apply_central_impulse(normal.normalized() * sawblade_impulse)
 
 func _handle_meatball_died(source: Meatball):
 	var parent = source.get_parent_node_3d()
@@ -97,6 +104,3 @@ func reset_game():
 
 func _on_reset_timer_timeout():
 	get_tree().reload_current_scene()
-
-func _handle_player_on_floor_status(status: bool):
-	$UserInterface/DebugLabel.text = "On floor: %s" % str(status)

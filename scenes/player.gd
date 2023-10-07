@@ -1,12 +1,9 @@
 extends Node3D
 class_name Player
 
-signal player_on_floor_status
-
-# TODO: Lower the angle when we can see through the level
 @export var camera_direction = Vector3(0, 5.0, 3.9)
 @export var camera_base_distance = 20.0
-@export var camera_base_fov = 20
+@export var camera_base_fov = 40
 
 var camera_position = camera_direction.normalized() * camera_base_distance
 var pawn: Meatball
@@ -43,8 +40,6 @@ func _process(delta):
 func _physics_process(delta):
 	$Camera3D.global_position = $Meatball.global_position + camera_position
 	$Camera3D.look_at($Meatball.global_position)
-	
-	emit_signal("player_on_floor_status", pawn.is_on_floor())
 
 func is_movement_input(event: InputEvent):
 	return event.is_action("move_left")\
@@ -54,6 +49,7 @@ func is_movement_input(event: InputEvent):
 
 
 func _on_meatball_resized():
-	var fov_tween = get_tree().create_tween()
-	var new_fov = camera_base_fov * pow($Meatball/CollisionShape3D.scale.x, 1.2)
+	var fov_tween = create_tween()
+	var collision_shape = $Meatball/CollisionShape3D.shape as SphereShape3D
+	var new_fov = camera_base_fov * sqrt(collision_shape.radius)
 	fov_tween.tween_property($Camera3D, "fov", new_fov, 0.5)
