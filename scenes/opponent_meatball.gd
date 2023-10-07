@@ -1,9 +1,6 @@
 extends Node3D
 class_name Opponent
 
-@export var mass = 2.0
-@export var jump_power = 250.0
-@export var base_speed = 10.0
 @export var retarget_time = 5.0
 @export var retarget_jitter = 1.0
 @export var max_jump_wait = 10.0
@@ -14,9 +11,6 @@ var target: Meatball
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pawn = $Meatball as Meatball
-	pawn.mass = mass
-	pawn.jump_power = jump_power
-	pawn.base_speed = base_speed
 	$RetargetTimer.wait_time = retarget_time + randf_range(-retarget_jitter/2, retarget_jitter/2)
 	$JumpTimer.wait_time = randf_range(0, max_jump_wait)
 	choose_target()

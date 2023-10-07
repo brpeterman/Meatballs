@@ -1,10 +1,10 @@
 [gd_scene load_steps=3 format=3 uid="uid://62v672g11cu"]
 
-[ext_resource type="Script" path="res://OpponentMeatball.gd" id="1_l2e2b"]
+[ext_resource type="Script" path="res://scenes/opponent_meatball.gd" id="1_urw16"]
 [ext_resource type="PackedScene" uid="uid://dg6mipn6t7m8s" path="res://scenes/meatball.tscn" id="2_k2abt"]
 
 [node name="OpponentMeatball" type="Node3D"]
-script = ExtResource("1_l2e2b")
+script = ExtResource("1_urw16")
 
 [node name="Meatball" parent="." instance=ExtResource("2_k2abt")]
 

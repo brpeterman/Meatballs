@@ -46,3 +46,9 @@ offset_top = 15.0
 offset_right = 166.0
 offset_bottom = 41.0
 text = "Active meatballs: 0"
+
+[node name="DebugLabel" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "On floor: false"

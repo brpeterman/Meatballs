@@ -3,15 +3,15 @@ class_name Meatball
 
 signal meatball_collided
 signal died
+signal resized
 
-@export var base_speed = 10.0
-@export var movement_force = 50.0
+@export var base_speed = 30.0
+@export var movement_force = 100.0
 @export var drag = 0.2
-@export var jump_power = 250.0
+@export var jump_power = 5.0
 
-var MASS_DELTA = 0.5
-var MAX_MASS = 3.0
-var SIZE_DELTA = 1.4
+var MASS_DELTA = 0.25
+var SIZE_DELTA = pow((3 * MASS_DELTA) / (4 * PI), 1.0/3.0) / 2.0
 var OUT_OF_BOUNDS = 500.0
 
 var input_direction = Vector3.ZERO
@@ -34,17 +34,17 @@ func _physics_process(delta):
 		emit_signal("died", self)
 	
 	if is_on_floor():
-		if input_direction != Vector3.ZERO and can_accelerate():
+		if input_direction != Vector3.ZERO and is_max_speed():
+			# Remove the component that's in the direction of current movement
+			input_direction -= linear_velocity.normalized()
+			
+		if input_direction != Vector3.ZERO:
 			apply_central_force(input_direction * movement_force)
 			input_direction = Vector3.ZERO
 	
 		if jump_impulse != Vector3.ZERO:
-			apply_central_force(jump_impulse * sqrt(mass))
+			apply_central_impulse(jump_impulse)
 			jump_impulse = Vector3.ZERO
-	
-	# Rotate the mesh based on velocity
-	#$MeshInstance3D.rotate(Vector3(0, 0, -1), linear_velocity.x * delta)
-	#$MeshInstance3D.rotate(Vector3(1, 0, 0), linear_velocity.z * delta)
 
 func _integrate_forces(state: PhysicsDirectBodyState3D):	
 	for contact_idx in state.get_contact_count():
@@ -57,19 +57,20 @@ func _integrate_forces(state: PhysicsDirectBodyState3D):
 	
 func reload_floor_normal():
 	var space_state = get_world_3d().direct_space_state
-	var length = $CollisionShape3D.scale.x + 0.2
+	var length = sqrt(2) * $CollisionShape3D.scale.x # Far enough to see a 45deg slope
 	var query = PhysicsRayQueryParameters3D.create(global_position, global_position + Vector3.DOWN * length)
+	query.exclude = [self]
 	var result = space_state.intersect_ray(query)
 	
 	if result.is_empty():
 		floor_normal = Vector3.ZERO
 		return
 	
-	if not result["collider"] is Meatball:
-		floor_normal = result["normal"] as Vector3
+	# Any object that we're balanced on is the "floor"
+	floor_normal = (result["normal"] as Vector3).normalized()
 
-func can_accelerate():
-	return is_on_floor() and linear_velocity.length() < base_speed / mass
+func is_max_speed():
+	return linear_velocity.length() >= base_speed / mass
 
 func is_on_floor():
 	return floor_normal != Vector3.ZERO\
@@ -79,23 +80,23 @@ func set_direction(direction):
 	input_direction = direction
 
 func jump():
-	jump_impulse = floor_normal * jump_power
+	jump_impulse = floor_normal * jump_power * sqrt(mass)
 
 func shrink():
 	if mass <= MASS_DELTA:
 		emit_signal("died", self)
 		return
 	mass -= MASS_DELTA
-	resize(1.0/SIZE_DELTA)
+	resize(-SIZE_DELTA)
 	
 func grow():
-	if mass >= MAX_MASS:
-		mass = MAX_MASS
-		return
 	mass += MASS_DELTA
 	resize(SIZE_DELTA)
+	
 
-func resize(factor: float):
+func resize(size: float):
+	var new_size = $CollisionShape3D.scale.x + size
 	var tween = create_tween()
-	tween.tween_property($MeshInstance3D, "scale", Vector3(factor, factor, factor), 0.2).set_trans(Tween.TRANS_SPRING)
-	$CollisionShape3D.transform.scaled(Vector3(factor, factor, factor))
+	tween.tween_property($MeshInstance3D, "scale", Vector3(new_size, new_size, new_size), 0.2).set_trans(Tween.TRANS_SPRING)
+	$CollisionShape3D.scale = Vector3(new_size, new_size, new_size)
+	resized.emit()

@@ -2,9 +2,8 @@ extends Node
 
 @export var collision_momentum_threshold = 3.0
 @export var collision_momentum_tolerance = 0.2
-@export var collision_velocity_boost = 2.0
-@export var collision_dedupe_time_ms = 1000
-@export var slowdown_time_ms = 1000
+@export var collision_velocity_boost = 20.0
+@export var collision_dedupe_time_ms = 500
 
 var collision_cache = {}
 var player_count = 0
@@ -21,6 +20,8 @@ func new_game():
 	for node in meatballs:
 		node.connect("meatball_collided", _handle_meatball_collided)
 		node.connect("died", _handle_meatball_died)
+	
+	$Player.connect("player_on_floor_status", _handle_player_on_floor_status)
 
 func compare_momentum(a: Meatball, b: Meatball):
 	return a.linear_velocity.length() * a.mass < b.linear_velocity.length() * b.mass
@@ -43,8 +44,11 @@ func collision_key(a: Node, b: Node):
 func is_trading_collision(velocity1: Vector3, mass1: float, velocity2: Vector3, mass2: float):
 	var momentum1 = velocity1.length() * mass1
 	var momentum2 = velocity2.length() * mass2
+	var angle = min(velocity1.angle_to(velocity2), velocity2.angle_to(velocity1))
+	# TODO: Ignore angle if one is much faster than the other
 	return momentum1 + momentum2 > collision_momentum_threshold\
-		and abs(momentum1 - momentum2) > collision_momentum_tolerance
+		and abs(momentum1 - momentum2) > collision_momentum_tolerance\
+		and angle > PI/2.0
 
 func smash_meatballs(originator: Meatball, other: Meatball, normal: Vector3):
 	# Find the fastest, increase its mass. Find the slowest, decrease its mass
@@ -56,8 +60,8 @@ func smash_meatballs(originator: Meatball, other: Meatball, normal: Vector3):
 	
 	# Rebound off each other
 	var total_speed = originator.linear_velocity.length() + other.linear_velocity.length()
-	originator.apply_central_force(-normal * total_speed)
-	other.apply_central_force(normal * total_speed)
+	originator.apply_central_force(normal * total_speed * collision_velocity_boost * other.mass)
+	other.apply_central_force(-normal * total_speed * collision_velocity_boost * originator.mass)
 
 func _handle_meatball_died(source: Meatball):
 	var parent = source.get_parent_node_3d()
@@ -93,3 +97,6 @@ func reset_game():
 
 func _on_reset_timer_timeout():
 	get_tree().reload_current_scene()
+
+func _handle_player_on_floor_status(status: bool):
+	$UserInterface/DebugLabel.text = "On floor: %s" % str(status)
