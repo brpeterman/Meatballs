@@ -6,7 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://c6n8obyjsyoso" path="res://scenes/hat.tscn" id="4_xqtc7"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_n1pqf"]
-radius = 1.91
+radius = 2.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_77uxm"]
 albedo_color = Color(0.27451, 0.0862745, 0, 1)

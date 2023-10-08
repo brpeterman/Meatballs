@@ -15,8 +15,6 @@ const MASS_DELTA = 0.25
 const SIZE_DELTA = pow((3 * MASS_DELTA) / (4 * PI), 1.0/3.0)
 const OUT_OF_BOUNDS = 500.0
 const MAX_SPEED = 100.0
-const BASE_COLLISION_RADIUS = 1.9
-const BASE_MESH_SCALE = 2.0
 const MIN_MASS = 1.0
 
 var input_direction = Vector3.ZERO
@@ -24,15 +22,12 @@ var jump_impulse = Vector3.ZERO
 var floor_normal = Vector3.ZERO
 
 func _ready():
-	var collision_shape = $CollisionShape3D.shape as SphereShape3D
-	collision_shape.radius = BASE_COLLISION_RADIUS
-	$MeshInstance3D.scale = Vector3(BASE_MESH_SCALE, BASE_MESH_SCALE, BASE_MESH_SCALE)
 	resize(0.0)
 
-func _process(delta):
+func _process(_delta):
 	pass
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	reload_floor_normal()
 	
 	if global_position.length() > OUT_OF_BOUNDS:
@@ -62,8 +57,6 @@ func _integrate_forces(state: PhysicsDirectBodyState3D):
 			meatball_collided.emit(self, body, normal)
 		if body is SawBlades:
 			saw_collided.emit(self, normal)
-	
-	#state.integrate_forces()
 	
 func reload_floor_normal():
 	var space_state = get_world_3d().direct_space_state
@@ -109,5 +102,5 @@ func resize(size: float):
 	var new_mesh_scale = $MeshInstance3D.scale.x + size
 	var tween = create_tween()
 	tween.tween_property($MeshInstance3D, "scale", Vector3(new_mesh_scale, new_mesh_scale, new_mesh_scale), 0.2).set_trans(Tween.TRANS_SPRING)
-	collision_shape.radius += size
+	collision_shape.radius = new_mesh_scale
 	resized.emit(new_mesh_scale)
