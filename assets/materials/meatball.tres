@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bd13a2dxavg3j"]
+
+[ext_resource type="Texture2D" uid="uid://4r8s0rtcdnbj" path="res://assets/sauce/sauce_normal.png" id="1_kw107"]
+
+[resource]
+albedo_color = Color(0.262745, 0.117647, 0, 1)
+roughness = 0.8
+normal_enabled = true
+normal_scale = 0.3
+normal_texture = ExtResource("1_kw107")
+rim_enabled = true

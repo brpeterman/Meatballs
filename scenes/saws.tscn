@@ -1,13 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://d28vkolmle36p"]
+[gd_scene load_steps=8 format=3 uid="uid://cvegdp0rifta6"]
 
-[ext_resource type="PackedScene" uid="uid://cqr1mgxljjdmv" path="res://objects/saws.glb" id="1_a2ggj"]
+[ext_resource type="ArrayMesh" uid="uid://jt840u85dn2r" path="res://assets/meshes/assets_saw_crossbar.res" id="2_8rgux"]
+[ext_resource type="ArrayMesh" uid="uid://ctarb7ajljwpi" path="res://assets/meshes/assets_saw_blade.res" id="3_l0ap2"]
+[ext_resource type="ArrayMesh" uid="uid://ba4hw5n375qlb" path="res://assets/meshes/assets_saw_blade_rev.res" id="4_ud23g"]
 
-[sub_resource type="Animation" id="Animation_onefh"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_pouw4"]
+animation = &"rotate"
+
+[sub_resource type="Animation" id="Animation_yoq7y"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("SawbladesOrigin/Sawblade:rotation")
+tracks/0/path = NodePath("BladesMesh:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -19,7 +24,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SawbladesOrigin/SawbladeReversed:rotation")
+tracks/1/path = NodePath("BladesRevMesh:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -29,51 +34,59 @@ tracks/1/keys = {
 "values": [Vector3(0, 0, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_egxx7"]
-resource_name = "spin"
-length = 1.5
+[sub_resource type="Animation" id="Animation_0kie2"]
+resource_name = "rotate"
 loop_mode = 1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("SawbladesOrigin/Sawblade:rotation")
+tracks/0/path = NodePath("BladesMesh:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.75, 1.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(0, 0, 0), Vector3(0, 0, -3.14159), Vector3(0, 0, -6.28319)]
+"values": [Vector3(0, 0, 0), Vector3(0, 0, 6.28319)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("SawbladesOrigin/SawbladeReversed:rotation")
+tracks/1/path = NodePath("BladesRevMesh:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.75, 1.5),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector3(0, 0, 0), Vector3(0, 0, 3.14159), Vector3(0, 0, 6.28319)]
+"values": [Vector3(0, 0, 0), Vector3(0, 0, -6.28319)]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_ukkv2"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_yaeyv"]
 _data = {
-"RESET": SubResource("Animation_onefh"),
-"spin": SubResource("Animation_egxx7")
+"RESET": SubResource("Animation_yoq7y"),
+"rotate": SubResource("Animation_0kie2")
 }
 
-[node name="saws" instance=ExtResource("1_a2ggj")]
+[node name="Saws" type="Node3D"]
 
-[node name="Sawblade" parent="SawbladesOrigin" index="1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.45969)
+[node name="AnimationTree" type="AnimationTree" parent="."]
+tree_root = SubResource("AnimationNodeAnimation_pouw4")
+anim_player = NodePath("../AnimationPlayer")
+active = true
 
-[node name="SawbladeReversed" parent="SawbladesOrigin" index="2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.95969)
-
-[node name="SawAnimationPlayer" type="AnimationPlayer" parent="." index="2"]
-autoplay = "spin"
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_ukkv2")
+"": SubResource("AnimationLibrary_yaeyv")
 }
+
+[node name="CrossbarMesh" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_8rgux")
+
+[node name="BladesMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.64099)
+mesh = ExtResource("3_l0ap2")
+
+[node name="BladesRevMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.82592)
+mesh = ExtResource("4_ud23g")

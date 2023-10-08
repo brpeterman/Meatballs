@@ -2,7 +2,7 @@ extends Node3D
 class_name Player
 
 @export var camera_direction = Vector3(0, 5.0, 3.9)
-@export var camera_base_distance = 20.0
+@export var camera_base_distance = 15.0
 @export var camera_base_fov = 40
 
 var camera_position = camera_direction.normalized() * camera_base_distance
@@ -48,7 +48,7 @@ func is_movement_input(event: InputEvent):
 		or event.is_action("move_down")
 
 
-func _on_meatball_resized():
+func _on_meatball_resized(size: float):
 	var fov_tween = create_tween()
 	var collision_shape = $Meatball/CollisionShape3D.shape as SphereShape3D
 	var new_fov = camera_base_fov * sqrt(collision_shape.radius)

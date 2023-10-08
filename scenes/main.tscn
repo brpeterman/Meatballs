@@ -1,10 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://d4avt870ck81f"]
+[gd_scene load_steps=9 format=3 uid="uid://d4avt870ck81f"]
 
 [ext_resource type="Script" path="res://scenes/main.gd" id="1_fdygr"]
 [ext_resource type="PackedScene" uid="uid://bl4rmr34l48dw" path="res://scenes/level_1.tscn" id="1_t6vxg"]
 [ext_resource type="Script" path="res://scenes/level_1.gd" id="2_ah8y1"]
 [ext_resource type="PackedScene" uid="uid://cop5dcpbij7wi" path="res://scenes/player.tscn" id="3_mr1ls"]
 [ext_resource type="PackedScene" uid="uid://b5bqr2rf18suc" path="res://scenes/user_interface.tscn" id="5_i2e85"]
+[ext_resource type="Script" path="res://scenes/sauce_viewport.gd" id="6_yic33"]
+[ext_resource type="PackedScene" uid="uid://cn60k1an6k6c6" path="res://scenes/sauce_object.tscn" id="8_3tbj5"]
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_lp1hv"]
+viewport_path = NodePath("SauceViewport")
 
 [node name="Main" type="Node"]
 script = ExtResource("1_fdygr")
@@ -15,9 +20,39 @@ script = ExtResource("2_ah8y1")
 [node name="Player" parent="." instance=ExtResource("3_mr1ls")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.48049, 0)
 
-[node name="UserInterface" parent="." instance=ExtResource("5_i2e85")]
-
 [node name="ResetTimer" type="Timer" parent="."]
 wait_time = 5.0
 
+[node name="SauceViewport" type="SubViewport" parent="."]
+disable_3d = true
+handle_input_locally = false
+size = Vector2i(256, 256)
+render_target_clear_mode = 1
+render_target_update_mode = 4
+script = ExtResource("6_yic33")
+displacement_object = ExtResource("8_3tbj5")
+
+[node name="UserInterface" parent="." instance=ExtResource("5_i2e85")]
+
+[node name="Debug" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -117.0
+offset_bottom = 106.0
+grow_horizontal = 0
+
+[node name="TextureRect" type="TextureRect" parent="Debug"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("ViewportTexture_lp1hv")
+
 [connection signal="timeout" from="ResetTimer" to="." method="_on_reset_timer_timeout"]
+
+[editable path="Player"]

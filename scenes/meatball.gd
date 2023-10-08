@@ -16,7 +16,7 @@ const SIZE_DELTA = pow((3 * MASS_DELTA) / (4 * PI), 1.0/3.0)
 const OUT_OF_BOUNDS = 500.0
 const MAX_SPEED = 100.0
 const BASE_COLLISION_RADIUS = 1.9
-const BASE_MESH_SCALE = 2.0
+const BASE_MESH_SCALE = 1.0
 const MIN_MASS = 1.0
 
 var input_direction = Vector3.ZERO
