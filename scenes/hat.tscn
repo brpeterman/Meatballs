@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://c6n8obyjsyoso"]
+[gd_scene load_steps=2 format=3 uid="uid://biiwqelsww1vb"]
 
-[ext_resource type="PackedScene" uid="uid://basxmjr3cn3n3" path="res://objects/hat.glb" id="1_maldp"]
+[ext_resource type="ArrayMesh" uid="uid://uwnu77ius1a5" path="res://assets/meshes/assets_decor_hat.res" id="2_ar7wa"]
 
-[node name="Hat" instance=ExtResource("1_maldp")]
+[node name="Hat" type="Node3D"]
 
-[node name="Hat" parent="." index="0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("2_ar7wa")

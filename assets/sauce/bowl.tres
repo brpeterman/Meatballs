@@ -1,0 +1,22 @@
+[gd_resource type="ShaderMaterial" load_steps=6 format=3 uid="uid://dsf2md46apir7"]
+
+[ext_resource type="Shader" path="res://assets/sauce/bowl.gdshader" id="1_ep763"]
+[ext_resource type="Texture2D" uid="uid://4r8s0rtcdnbj" path="res://assets/sauce/sauce_normal.png" id="2_63xy4"]
+[ext_resource type="Texture2D" uid="uid://diw7dv41dib74" path="res://assets/sauce/sauce.png" id="2_tqg5l"]
+
+[sub_resource type="Gradient" id="Gradient_gl2mb"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_j5f6u"]
+gradient = SubResource("Gradient_gl2mb")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_ep763")
+shader_parameter/size = Vector2(32, 32)
+shader_parameter/max_thickness = 1.5
+shader_parameter/uv_scale = 5.0
+shader_parameter/metallic = 0.15
+shader_parameter/color = Color(1, 1, 1, 1)
+shader_parameter/trail_texture = SubResource("GradientTexture1D_j5f6u")
+shader_parameter/sauce_texture = ExtResource("2_tqg5l")
+shader_parameter/normal_texture = ExtResource("2_63xy4")
